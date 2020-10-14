@@ -3,8 +3,10 @@
 This is the homework repository of course `Systems Development and Frameworks`
 at `Hochschule für Technik und Wirtschaft` in Berlin.
 
-
 ![no js pls](./.github/img/header.png)
+
+## Group
+no-js-pls
 
 ## Homework - Exercise #0
 
