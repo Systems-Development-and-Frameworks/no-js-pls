@@ -2,7 +2,7 @@
   <div>
     <h1>News List</h1>
     <br>
-    <NewsItem v-for="item in newsItems" v-bind:news="item" @update="vote" @remove="removeItem"></NewsItem>
+    <NewsItem v-for="item in newsItems" :news="item" @update="vote" @remove="removeItem"></NewsItem>
     <br>
     <NewsForm @sendTitle="addItem"></NewsForm>
   </div>
