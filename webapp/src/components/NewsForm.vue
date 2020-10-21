@@ -1,5 +1,5 @@
 <template>
-  <form @submit="submitTitle" v-on:submit.prevent="onsubmit">
+  <form @submit.prevent="submitTitle">
     <input type="text" v-model="title" placeholder="Type title here">
     <button type="submit">Create</button>
   </form>
