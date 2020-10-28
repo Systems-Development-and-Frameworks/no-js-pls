@@ -17,7 +17,7 @@ jobs:
     steps:
     # Runs a single command using the runners shell
     - run: cd webapp && npm install
-    - run: cd webapp && npm run build --if-present
+    - run: cd webapp && npm run lint
     - run: cd webapp && npm run test:unit
       env:
         CI: true
