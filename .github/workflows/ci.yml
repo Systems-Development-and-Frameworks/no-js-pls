@@ -15,9 +15,14 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - working-directory: webapp
-    - run: npm install
-    - run: npm run lint
-    - run: npm run test:unit
+    - name: Install
+      run: npm install
+      working-directory: webapp
+    - name: Run Linter
+      run: npm run lint
+      working-directory: webapp
+    - name: Run Tests
+      run: npm run test:unit
+      working-directory: webapp
       env:
         CI: true
