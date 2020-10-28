@@ -15,9 +15,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - run: cd webapp && npm install
-    - run: cd webapp && npm run lint
-    - run: cd webapp && npm run test:unit
+    - working-directory: webapp
+    - run: npm install
+    - run: npm run lint
+    - run: npm run test:unit
       env:
         CI: true
