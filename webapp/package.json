@@ -6,7 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@types/jest": "^26.0.15",
@@ -17,12 +19,20 @@
     "vue-property-decorator": "^8.4.2"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^6.0.27",
+    "@storybook/addon-actions": "^6.0.27",
+    "@storybook/addon-controls": "^6.0.27",
+    "@storybook/addon-essentials": "^6.0.27",
+    "@storybook/addon-links": "^6.0.27",
+    "@storybook/vue": "^6.0.27",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/test-utils": "^1.1.0",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-loader": "^8.1.0",
     "jest": "^26.6.1",
+    "react-is": "^17.0.1",
     "ts-jest": "^26.4.3",
     "typescript": "~3.9.3",
     "vue-jest": "^3.0.7",
