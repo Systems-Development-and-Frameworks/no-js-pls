@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { Item } from '../interface/item';
+import { Item } from '@/interface/item';
 
 @Component
 export default class NewsItem extends Vue {
