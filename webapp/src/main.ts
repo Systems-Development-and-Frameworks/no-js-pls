@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import App from './App.vue';
-// const path = require('path');
 import * as path from 'path';
 
 Vue.config.productionTip = false;
