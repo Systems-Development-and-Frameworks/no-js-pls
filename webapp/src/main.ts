@@ -8,7 +8,7 @@ new Vue({
   render: (h) => h(App),
 }).$mount('#app');
 
-module.exports = {
+export default {
   stories: ['../src/**/*.stories.ts'],
   addons: [
     {
