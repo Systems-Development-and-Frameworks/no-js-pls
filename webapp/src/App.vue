@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import NewsList from '@/components/NewsList.vue';
+import NewsList from '@/components/NewsList/NewsList.vue';
 
 @Component({
   components: {
