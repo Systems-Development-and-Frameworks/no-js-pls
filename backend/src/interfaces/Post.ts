@@ -5,4 +5,10 @@ export interface Post {
     title: string;
     votes: number;
     author: User;
+    lastVoted: Votes[];
+}
+
+interface Votes {
+    username: string;
+    isUpvote: boolean;
 }
