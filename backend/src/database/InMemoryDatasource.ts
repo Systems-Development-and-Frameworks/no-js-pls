@@ -1,40 +1,31 @@
-import { DataSource } from 'apollo-datasource';
+import { DataSource, DataSourceConfig } from 'apollo-datasource';
 import { Post } from '../interfaces/Post';
 import { User } from '../interfaces/User';
 import { MutationResolvers } from '../generated/graphqlgen';
+import { randomBytes } from 'crypto';
 import PostInput = MutationResolvers.PostInput;
 import UserInput = MutationResolvers.UserInput;
+import { Context } from "../types";
 
 export class InMemoryDatasource extends DataSource {
-    users: User[] = [
-        {
-            name: 'Stefan'
-        },
-        {
-            name: 'Daniel'
-        },
-        {
-            name: 'Robin'
-        }
-    ];
+    users: User[] = [];
 
-    posts: Post[] = [
-        {
-            id: '0',
-            title: 'Test1',
-            votes: 4,
-            author: this.users[0]
-        },
-        {
-            id: '1',
-            title: 'Test2',
-            votes: 1,
-            author: this.users[1]
-        }
-    ];
+    posts: Post[] = [];
 
     constructor() {
         super();
+    }
+
+    initialize(config: DataSourceConfig<Context>): void | Promise<void> {
+        //return super.initialize(config);
+    }
+
+    set Posts(posts: Post[]) {
+        this.posts = posts;
+    }
+
+    set Users(users: User[]) {
+        this.users = users;
     }
 
     getAllPosts(): Post[] {
@@ -54,19 +45,40 @@ export class InMemoryDatasource extends DataSource {
     }
 
     upvotePost(id: string, voter: UserInput): Post {
-        const index = this.posts.findIndex(e => e.id === id && e.author.name === voter.name);
-        ++this.posts[index].votes;
-        return this.posts[index];
+        return this.votePost(id, voter.name, true);
+    }
+
+    downVotePost(id: string, voter: UserInput): Post {
+        return this.votePost(id, voter.name, true);
     }
 
     writePost(post: PostInput): Post {
         const newPost: Post = {
             ...post,
-            id: this.posts.length.toString(),
-            votes: 0
+            id: randomBytes(16).toString('hex'),
+            votes: 0,
+            lastVoted: []
         };
 
         this.posts.push(newPost);
         return newPost;
+    }
+
+    private votePost(postId: string, username: string, isUpvote: boolean): Post {
+        const index = this.posts.findIndex(e => e.id === postId);
+        if (index < 0)
+            return null;
+
+        const voteIndex = this.posts[index].lastVoted.findIndex(e => e.username === username);
+
+        if (voteIndex < 0) { // has not voted yet
+            this.posts[index].lastVoted.push({username: username, isUpvote: isUpvote});
+            ++this.posts[index].votes;
+        } else if (this.posts[index].lastVoted[voteIndex].isUpvote != isUpvote) { // change vote
+            this.posts[index].lastVoted[voteIndex].isUpvote = isUpvote;
+            ++this.posts[index].votes;
+        }
+
+        return this.posts[index];
     }
 }
