@@ -8,8 +8,7 @@ on: [push, workflow_dispatch]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
-  check:
+  check-webapp:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -29,5 +28,27 @@ jobs:
     - name: Run Tests
       run: npm run test:unit
       working-directory: webapp
+      env:
+        CI: true
+  check-backend:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+    - name: Install
+      run: npm install
+      working-directory: backend
+    - name: Run Linter
+      run: npm run lint
+      working-directory: backend
+    - name: Run Tests
+      run: npm run test
+      working-directory: backend
       env:
         CI: true
