@@ -1,6 +1,6 @@
 import { MutationResolvers, QueryResolvers, Resolvers } from "../generated/graphqlgen";
 import { PostMutationResolver, PostQueryResolver } from "./post.resolver";
-import { UserQueryResolver } from "./user.resolver";
+import {UserMutationResolver, UserQueryResolver} from "./user.resolver";
 import { NestedFields } from "./nested/nestedFields";
 
 const Query: QueryResolvers.Type = {
@@ -9,6 +9,7 @@ const Query: QueryResolvers.Type = {
 };
 
 const Mutation: MutationResolvers.Type = {
+    ...UserMutationResolver,
     ...PostMutationResolver
 };
 
