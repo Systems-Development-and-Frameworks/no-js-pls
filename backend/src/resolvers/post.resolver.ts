@@ -14,11 +14,11 @@ export const PostMutationResolver: Pick<MutationResolvers.Type
     | 'upvote'
     > = {
     // @ts-ignore
-    write: (parent, { post }, { dataSources }) => {
-        return dataSources.databaseAPI.writePost(post);
+    write: (parent, { post }, ctx) => {
+        return ctx.dataSources.databaseAPI.writePost(post, ctx.userId);
     },
     // @ts-ignore
-    upvote: (parent, {id, voter}, { dataSources }) => {
-        return dataSources.databaseAPI.upvotePost(id, voter);
+    upvote: (parent, { id}, ctx) => {
+        return ctx.dataSources.databaseAPI.upVotePost(id, ctx.userId);
     }
 };

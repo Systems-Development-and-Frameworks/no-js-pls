@@ -4,11 +4,11 @@ export interface Post {
     id: string;
     title: string;
     votes: number;
-    author: User;
+    author: string;
     lastVoted: Votes[];
 }
 
 interface Votes {
-    username: string;
+    voterId: string;
     isUpvote: boolean;
 }

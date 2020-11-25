@@ -4,8 +4,8 @@ import { User } from '../interfaces/User';
 import { MutationResolvers } from '../generated/graphqlgen';
 import { randomBytes } from 'crypto';
 import PostInput = MutationResolvers.PostInput;
-import UserInput = MutationResolvers.UserInput;
 import { Context } from "../types";
+import {generateSHA512Hash} from "../authorization/cryptography";
 
 export class InMemoryDatasource extends DataSource {
     users: User[] = [];
@@ -28,6 +28,25 @@ export class InMemoryDatasource extends DataSource {
         this.users = users;
     }
 
+    createUser(name: string, email: string, password: string): string {
+        const newUser: User = {
+            id: randomBytes(16).toString('hex'),
+            name,
+            email,
+            password: generateSHA512Hash(password)
+        };
+        this.users.push(newUser);
+        return newUser.id;
+    }
+
+    getUserPerId(id: string): User {
+        return this.users.find(e => e.id === id);
+    }
+
+    getUserPerEmail(email: string): User {
+        return this.users.find(e => e.email === email);
+    }
+
     getAllPosts(): Post[] {
         return this.posts;
     }
@@ -36,27 +55,29 @@ export class InMemoryDatasource extends DataSource {
         return this.users;
     }
 
-    getAllPostsOfOneUser(name: string): Post[] {
-        return this.posts.filter(e => e.author.name === name);
+    getAuthor(postId: string): User {
+        const authorId = this.posts.find(post => post.id === postId).author;
+        return this.users.find(user => user.id === authorId);
     }
 
-    getAuthor(id: string): User {
-        return this.posts.filter(e => e.id === id)[0].author;
+    getAllPostsOfOneUser(userId: string): Post[] {
+        return this.posts.filter(post => post.author === userId);
     }
 
-    upvotePost(id: string, voter: UserInput): Post {
-        return this.votePost(id, voter.name, true);
+    upVotePost(id: string, voterId: string): Post {
+        return this.votePost(id, voterId, true);
     }
 
-    downVotePost(id: string, voter: UserInput): Post {
-        return this.votePost(id, voter.name, true);
+    downVotePost(id: string, voter: User): Post {
+        return this.votePost(id, voter.name, false);
     }
 
-    writePost(post: PostInput): Post {
+    writePost(post: PostInput, author: string): Post {
         const newPost: Post = {
             ...post,
             id: randomBytes(16).toString('hex'),
             votes: 0,
+            author,
             lastVoted: []
         };
 
@@ -64,15 +85,15 @@ export class InMemoryDatasource extends DataSource {
         return newPost;
     }
 
-    private votePost(postId: string, username: string, isUpvote: boolean): Post {
+    private votePost(postId: string, voterId: string, isUpvote: boolean): Post {
         const index = this.posts.findIndex(e => e.id === postId);
         if (index < 0)
             return null;
 
-        const voteIndex = this.posts[index].lastVoted.findIndex(e => e.username === username);
+        const voteIndex = this.posts[index].lastVoted.findIndex(e => e.voterId === voterId);
 
         if (voteIndex < 0) { // has not voted yet
-            this.posts[index].lastVoted.push({username: username, isUpvote: isUpvote});
+            this.posts[index].lastVoted.push({voterId, isUpvote: isUpvote});
             ++this.posts[index].votes;
         } else if (this.posts[index].lastVoted[voteIndex].isUpvote != isUpvote) { // change vote
             this.posts[index].lastVoted[voteIndex].isUpvote = isUpvote;
