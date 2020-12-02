@@ -231,7 +231,6 @@ export namespace UserResolvers {
     id: (parent: User) => parent.id,
     name: (parent: User) => parent.name,
     email: (parent: User) => parent.email,
-    password: (parent: User) => parent.password,
     posts: (parent: User) => (parent.posts === undefined ? null : parent.posts)
   };
 
@@ -270,23 +269,6 @@ export namespace UserResolvers {
       };
 
   export type EmailResolver =
-    | ((
-        parent: User,
-        args: {},
-        ctx: Context,
-        info: GraphQLResolveInfo
-      ) => string | Promise<string>)
-    | {
-        fragment: string;
-        resolve: (
-          parent: User,
-          args: {},
-          ctx: Context,
-          info: GraphQLResolveInfo
-        ) => string | Promise<string>;
-      };
-
-  export type PasswordResolver =
     | ((
         parent: User,
         args: {},
@@ -356,23 +338,6 @@ export namespace UserResolvers {
         };
 
     email:
-      | ((
-          parent: User,
-          args: {},
-          ctx: Context,
-          info: GraphQLResolveInfo
-        ) => string | Promise<string>)
-      | {
-          fragment: string;
-          resolve: (
-            parent: User,
-            args: {},
-            ctx: Context,
-            info: GraphQLResolveInfo
-          ) => string | Promise<string>;
-        };
-
-    password:
       | ((
           parent: User,
           args: {},
