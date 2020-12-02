@@ -7,7 +7,7 @@
     "start": "ts-node src/index.ts",
     "dev": "dotenv -- nodemon -e ts src/index.ts",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "dotenv -e test.env -- jest"
   },
   "keywords": [],
   "author": "",

@@ -12,19 +12,19 @@ import {permission} from "./shield/shield";
 const databaseAPI = new InMemoryDatasource();
 databaseAPI.Users = [
     {
-        id: randomBytes(16).toString('hex'),
+        id: '123',
         name: 'Stefan',
         email: 'test1@test.de',
         password: generateSHA512Hash('test123')
     },
     {
-        id: randomBytes(16).toString('hex'),
+        id: '456',
         name: 'Daniel',
         email: 'test2@test.de',
         password: generateSHA512Hash('test123')
     },
     {
-        id: randomBytes(16).toString('hex'),
+        id: '789',
         name: 'Robin',
         email: 'test3@test.de',
         password: generateSHA512Hash('test123')
@@ -61,7 +61,7 @@ export const createServer = (db?: InMemoryDatasource) => {
             };
         },
        context: ({req}) => ({
-           userId: verifyToken(req.headers.authorization),
+           userId: verifyToken(req?.headers?.authorization),
        }),
         playground: true,
         introspection: true
