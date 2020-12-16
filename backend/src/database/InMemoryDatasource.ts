@@ -6,8 +6,9 @@ import { randomBytes } from 'crypto';
 import PostInput = MutationResolvers.PostInput;
 import { Context } from "../types";
 import {generateSHA512Hash} from "../authorization/cryptography";
+import {DatasourceAPI} from "./DatasourceAPI";
 
-export class InMemoryDatasource extends DataSource {
+export class InMemoryDatasource extends DataSource implements DatasourceAPI{
     users: User[] = [];
 
     posts: Post[] = [];

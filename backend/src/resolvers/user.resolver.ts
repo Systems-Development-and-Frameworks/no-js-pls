@@ -28,7 +28,9 @@ export const UserMutationResolver: Pick<MutationResolvers.Type
         if (password.length < 8) throw Error('Password is too short!');
         if (email.indexOf('@') < 1) throw Error('Invalid email address!');
         if (dataSources.databaseAPI.getUserPerEmail(email) !== undefined) throw Error('Email address already taken!');
+        console.log("HIII!!!")
         const userId = dataSources.databaseAPI.createUser(name, email, password);
+        console.log("HII2");
         return createToken(userId);
     }
 };

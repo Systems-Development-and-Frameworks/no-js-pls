@@ -8,9 +8,15 @@ import {verifyToken} from "./authorization/authorization";
 import {applyMiddleware} from "graphql-middleware";
 import { makeExecutableSchema } from 'graphql-tools'
 import {permission} from "./shield/shield";
+import {DataSource} from "apollo-datasource";
+import {Neo4JDatasource} from "./database/Neo4JDatasource";
+import {auth, driver} from "neo4j-driver";
+import {NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER} from "./config/env.config";
 
-const databaseAPI = new InMemoryDatasource();
-databaseAPI.Users = [
+const db = driver(NEO4J_URI, auth.basic(NEO4J_USER, NEO4J_PASSWORD));
+const databaseAPI = new Neo4JDatasource(db);
+// const databaseAPI = new InMemoryDatasource();
+/* databaseAPI.Users = [
     {
         id: '123',
         name: 'Stefan',
@@ -45,13 +51,13 @@ databaseAPI.Posts = [
         author: databaseAPI.users[1].id,
         lastVoted: []
     }
-];
+]; */
 const typeDefs = gql`${readFileSync('src/schema.graphql')}`;
 // @ts-ignore
 let schema = makeExecutableSchema({typeDefs, resolvers});
 schema = applyMiddleware(schema, permission);
 
-export const createServer = (db?: InMemoryDatasource) => {
+export const createServer = (db?: DataSource) => {
     const dbAPI =  db ? db : databaseAPI;
    return new ApolloServer({
         schema,
