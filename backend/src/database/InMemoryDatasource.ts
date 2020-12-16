@@ -29,7 +29,7 @@ export class InMemoryDatasource extends DataSource implements DatasourceAPI{
         this.users = users;
     }
 
-    createUser(name: string, email: string, password: string): string {
+    createUser(name: string, email: string, password: string): Promise<string> {
         const newUser: User = {
             id: randomBytes(16).toString('hex'),
             name,
@@ -37,43 +37,59 @@ export class InMemoryDatasource extends DataSource implements DatasourceAPI{
             password: generateSHA512Hash(password)
         };
         this.users.push(newUser);
-        return newUser.id;
+        return new Promise<string>(resolve => {resolve(newUser.id)});
     }
 
-    getUserPerId(id: string): User {
-        return this.users.find(e => e.id === id);
+    getUserPerId(id: string): Promise<User> {
+        return new Promise<User>(resolve => {
+            resolve(this.users.find(e => e.id === id));
+        });
     }
 
-    getUserPerEmail(email: string): User {
-        return this.users.find(e => e.email === email);
+    getUserPerEmail(email: string): Promise<User | undefined> {
+        return new Promise<User>(resolve => {
+            resolve(this.users.find(e => e.email === email));
+        });
     }
 
-    getAllPosts(): Post[] {
-        return this.posts;
+    getAllPosts(): Promise<Post[]> {
+        return new Promise<Post[]>(resolve => {
+            resolve(this.posts);
+        });
     }
 
-    getAllUsers(): User[] {
-        return this.users;
+    getAllUsers(): Promise<User[]> {
+        return new Promise<User[]>(resolve => {
+            resolve(this.users);
+        });
     }
 
-    getAuthor(postId: string): User {
+    getAuthor(postId: string): Promise<User> {
         const authorId = this.posts.find(post => post.id === postId).author;
-        return this.users.find(user => user.id === authorId);
+        return new Promise<User>(resolve => {
+            resolve(this.users.find(user => user.id === authorId));
+        });
     }
 
-    getAllPostsOfOneUser(userId: string): Post[] {
-        return this.posts.filter(post => post.author === userId);
+    getAllPostsOfOneUser(userId: string): Promise<Post[]> {
+        return new Promise<Post[]>(resolve => {
+            resolve(this.posts.filter(post => post.author === userId));
+        });
     }
 
-    upVotePost(id: string, voterId: string): Post {
-        return this.votePost(id, voterId, true);
+    upVotePost(id: string, voterId: string): Promise<Post> {
+        return new Promise<Post>(resolve => {
+            resolve(this.votePost(id, voterId, true));
+        });
     }
 
-    downVotePost(id: string, voter: User): Post {
-        return this.votePost(id, voter.name, false);
+    downVotePost(id: string, voterId: string): Promise<Post> {
+        return new Promise<Post>(resolve => {
+            resolve(this.votePost(id, voterId, false));
+        });
     }
 
-    writePost(post: PostInput, author: string): Post {
+    writePost(post: PostInput, author: string): Promise<Post> {
         const newPost: Post = {
             ...post,
             id: randomBytes(16).toString('hex'),
@@ -83,7 +99,9 @@ export class InMemoryDatasource extends DataSource implements DatasourceAPI{
         };
 
         this.posts.push(newPost);
-        return newPost;
+        return new Promise<Post>(resolve => {
+            resolve(newPost);
+        });
     }
 
     private votePost(postId: string, voterId: string, isUpvote: boolean): Post {

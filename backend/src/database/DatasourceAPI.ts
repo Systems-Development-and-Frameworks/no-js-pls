@@ -8,23 +8,23 @@ import PostInput = MutationResolvers.PostInput;
 export interface DatasourceAPI {
     initialize(config: DataSourceConfig<Context>): void | Promise<void>;
 
-    createUser(name: string, email: string, password: string): string;
+    createUser(name: string, email: string, password: string): Promise<string>;
 
-    getUserPerId(id: string): User;
+    getUserPerId(id: string): Promise<User>;
 
-    getUserPerEmail(email: string): User;
+    getUserPerEmail(email: string): Promise<User | undefined>;
 
-    getAllPosts(): Post[];
+    getAllPosts(): Promise<Post[]>;
 
-    getAllUsers(): User[];
+    getAllUsers(): Promise<User[]>;
 
-    getAuthor(postId: string): User;
+    getAuthor(postId: string): Promise<User>;
 
-    getAllPostsOfOneUser(userId: string);
+    getAllPostsOfOneUser(userId: string): Promise<Post[]>;
 
-    upVotePost(id: string, voterId: string);
+    upVotePost(id: string, voterId: string): Promise<Post>;
 
-    downVotePost(id: string, voter: User);
+    downVotePost(id: string, voterId: string): Promise<Post>;
 
-    writePost(post: PostInput, author: string): Post;
+    writePost(post: PostInput, author: string): Promise<Post>;
 }

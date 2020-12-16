@@ -14,6 +14,9 @@ import {auth, driver} from "neo4j-driver";
 import {NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER} from "./config/env.config";
 
 const db = driver(NEO4J_URI, auth.basic(NEO4J_USER, NEO4J_PASSWORD));
+export const closeConnection = async (): Promise<void> => {
+    await db.close();
+};
 const databaseAPI = new Neo4JDatasource(db);
 // const databaseAPI = new InMemoryDatasource();
 /* databaseAPI.Users = [
