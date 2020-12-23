@@ -18,7 +18,9 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
         this.driver = driver;
     }
 
-    initialize(config: DataSourceConfig<Context>): void | Promise<void> { }
+    initialize(config: DataSourceConfig<Context>): void | Promise<void> {
+        // intentionally empty
+    }
 
     async createUser(name: string, email: string, password: string): Promise<string> {
         if (!name || name.length < 1 && name.length >= 32) throw Error('Name is invalid');
@@ -119,20 +121,6 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
             .finally(() => session.close());
 
         return user;
-    }
-
-    async getVoteCountOfPost(postId: string): Promise<number> {
-        let count: number;
-        const session = this.createSession();
-        await session.readTransaction(tx => {
-            tx.run("")
-                .then()
-                .catch(err => console.log(err))
-        })
-            .catch(err => console.log(err))
-            .finally(() => session.close());
-
-        return count;
     }
 
     async getAllPostsOfOneUser(userId: string): Promise<Post[]> {
