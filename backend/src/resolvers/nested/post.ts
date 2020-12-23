@@ -6,7 +6,6 @@ export const Post: PostResolvers.Type = {
         return ctx.dataSources.databaseAPI.getAuthor(parent.id);
     },
     votes: (parent, args, ctx) => {
-        // TODO: Anfrage an die Datenbank
-        return null;
+        return ctx.dataSources.databaseAPI.countVotesOfOnePost(parent.id, true);
     }
 };

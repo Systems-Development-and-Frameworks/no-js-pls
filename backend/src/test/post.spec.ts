@@ -6,52 +6,21 @@ import { generateSHA512Hash } from '../authorization/cryptography';
 import { Post } from "../interfaces/Post";
 import { User } from "../interfaces/User";
 import { verifyToken } from "../authorization/authorization";
+import {Neo4JDatasource} from "../database/Neo4JDatasource";
+import {auth, driver} from "neo4j-driver";
+import {NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER} from "../config/env.config";
 
-let db: InMemoryDatasource = new InMemoryDatasource();
+const drv = driver(NEO4J_URI, auth.basic(NEO4J_USER, NEO4J_PASSWORD));
+const db: Neo4JDatasource = new Neo4JDatasource(drv);
 const server = createServer(db);
 const {query, mutate} = createTestClient(server);
 
-const getDummyUsers = (): User[] => [
-    {
-        id: '123',
-        name: 'Stefan',
-        email: 'test1@test.de',
-        password: generateSHA512Hash('test123')
-    },
-    {
-        id: '456',
-        name: 'Daniel',
-        email: 'test2@test.de',
-        password: generateSHA512Hash('test123')
-    },
-    {
-        id: '789',
-        name: 'Robin',
-        email: 'test3@test.de',
-        password: generateSHA512Hash('test123')
-    }
-];
+beforeEach(async () => {
+    await db.erase();
+})
 
-const getDummyPosts = (): Post[] => [
-    {
-        id: '0',
-        title: 'Test1',
-        votes: 0,
-        author: '123',
-        lastVoted: []
-    },
-    {
-        id: '1',
-        title: 'Test2',
-        votes: 0,
-        author: '456',
-        lastVoted: []
-    }
-];
-
-beforeEach(() => {
-    db = new InMemoryDatasource();
-    server.requestOptions.dataSources = () => {return {databaseAPI: db}};
+afterAll( async () => {
+    await drv.close();
 })
 
 describe('queries', () => {
@@ -75,8 +44,10 @@ describe('queries', () => {
         })
 
         describe('given posts in the database', () => {
-            beforeEach(() => {
-                db.posts = getDummyPosts();
+            beforeEach(async () => {
+                const userId = await db.createUser('Stefan', 'test1@test.de', generateSHA512Hash('test123'));
+                await db.writePost({title: 'Test1'}, userId);
+                await db.writePost({title: 'Test2'}, userId);
             })
 
             it('returns posts', async () => {
@@ -85,11 +56,9 @@ describe('queries', () => {
                     .toMatchObject({
                         errors: undefined,
                         data: { posts:  [{
-                                id: '0',
                                 title: 'Test1',
                             },
                             {
-                                id: '1',
                                 title: 'Test2',
                             }]
                         }
@@ -131,9 +100,9 @@ describe('mutations', () => {
         `;
 
         it('adds a post to db.posts', async () => {
-            expect(db.posts).toHaveLength(0);
+            expect(await db.getAllPosts()).toHaveLength(0);
             await action();
-            expect(db.posts).toHaveLength(1);
+            expect(await db.getAllPosts()).toHaveLength(1);
         })
 
         it('responds with created post', async () => {
@@ -158,8 +127,8 @@ describe('mutations', () => {
     })
 
     describe('UPVOTE_POST', () => {
-        const action = () => mutate({ mutation: UPVOTE_POST, variables: {id: getDummyPosts()[0].id,
-                voter: {name: getDummyUsers()[0].name}}});
+        let post: Post;
+        const action = () => mutate({ mutation: UPVOTE_POST, variables: {id: post.id}});
         const UPVOTE_POST = gql`
             mutation ($id: ID!) {
                 upvote(id: $id) {
@@ -171,20 +140,22 @@ describe('mutations', () => {
         `;
 
         beforeEach(async () => {
-            db.posts = getDummyPosts();
+            const userId = await db.createUser('Stefan', 'test1@test.de', generateSHA512Hash('test123'));
+            post = await db.writePost({title: 'Test1'}, userId);
+            await db.writePost({title: 'Test2'}, userId);
         })
 
         it('increment upvote in post', async () => {
-            expect(db.posts.find(e => e.id === getDummyPosts()[0].id).votes).toBe(0);
+            expect(await db.countVotesOfOnePost(post.id, true)).toBe(0);
             await action();
-            expect(db.posts.find(e => e.id === getDummyPosts()[0].id).votes).toBe(1);
+            expect(await db.countVotesOfOnePost(post.id, true)).toBe(1);
         })
 
         it('increment upvote in post only once per user', async () => {
-            expect(db.posts.find(e => e.id === getDummyPosts()[0].id).votes).toBe(0);
+            expect(await db.countVotesOfOnePost(post.id, true)).toBe(0);
             await action();
             await action();
-            expect(db.posts.find(e => e.id === getDummyPosts()[0].id).votes).toBe(1);
+            expect(await db.countVotesOfOnePost(post.id, true)).toBe(1);
         })
 
         it('upvote post without a token, should fail', async () =>{

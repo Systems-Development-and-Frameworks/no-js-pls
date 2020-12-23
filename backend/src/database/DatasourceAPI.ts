@@ -27,4 +27,6 @@ export interface DatasourceAPI {
     downVotePost(id: string, voterId: string): Promise<Post>;
 
     writePost(post: PostInput, author: string): Promise<Post>;
+
+    countVotesOfOnePost(postId: string, isUpVoted: boolean): Promise<number>;
 }

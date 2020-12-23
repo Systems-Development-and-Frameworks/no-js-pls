@@ -81,7 +81,7 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
         let posts: Post[];
         const session = this.createSession();
         await session.readTransaction(tx => {
-            tx.run("MATCH (p:Post) RETURN p {.*}").then(result => {
+            tx.run("MATCH (p:Post) RETURN p {.*} ORDER BY p.title").then(result => {
                 posts = result.records.map(result => result.get('p'));
             });
         })
@@ -139,7 +139,7 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
         let posts: Post[];
         const session = this.createSession();
         await session.readTransaction(tx => {
-            tx.run("MATCH (u:USER)<-[:AUTHORED_BY]-(p:Post) RETURN p {.*}").then(result => {
+            tx.run("MATCH (u:USER)<-[:AUTHORED_BY]-(p:Post) RETURN p {.*} ORDER BY p.title").then(result => {
                 posts = result.records.map(record => record.get('p'));
             })
                 .catch(err => console.log(err));
@@ -177,12 +177,28 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
         return newPost;
     }
 
+    async countVotesOfOnePost(postId: string, isUpVoted: boolean): Promise<number> {
+        let count: number;
+        const session = this.createSession();
+        await session.readTransaction(tx => {
+            tx.run("MATCH (u:User)-[v:VOTE {isUpVoted: $isUpVoted}]->(p:Post {id: $id}) RETURN count(v) as count", {
+                id: postId, isUpVoted: isUpVoted
+            })
+                .then(result => {
+                    count = result.records[0]?.get('count').toNumber();
+                })
+                .catch(err => console.log(err))
+        });
+
+        return count;
+    }
+
     private async votePost(postId: string, voterId: string, isUpvote: boolean): Promise<Post> {
         let post: Post;
         const session = this.createSession();
         await session.writeTransaction(tx => {
             tx.run("MATCH (p:Post {id: $postId}), (u:User {id: $voterId}) " +
-                "CREATE (p)<-[:VOTE {isUpVoted: $isUpVoted}]-(u) RETURN p {.*}", {
+                "MERGE (p)<-[:VOTE {isUpVoted: $isUpVoted}]-(u) RETURN p {.*}", {
                 postId: postId, voterId: voterId, isUpVoted: isUpvote
             }).then(result => {
                 post = result.records[0].get('p')
@@ -196,9 +212,16 @@ export class Neo4JDatasource extends DataSource implements DatasourceAPI {
     }
 
     private createSession(): Session {
-        return this.driver.session({
-            database: NEO4J_DATABASE,
-            defaultAccessMode: session.WRITE
-        });
+        const options = NEO4J_DATABASE
+            ? { database: NEO4J_DATABASE, defaultAccessMode: session.WRITE }
+            : {};
+        return this.driver.session(options);
+    }
+
+    public async erase(): Promise<void> {
+        const session = this.createSession();
+        await session.writeTransaction(tx => tx.run("MATCH (a) -[r] -> () DELETE a, r"));
+        await session.writeTransaction(tx => tx.run("MATCH (a) DELETE a"));
+        await session.close();
     }
 }

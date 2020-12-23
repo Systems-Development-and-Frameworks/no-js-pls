@@ -103,6 +103,11 @@ export class InMemoryDatasource extends DataSource implements DatasourceAPI{
             resolve(newPost);
         });
     }
+    countVotesOfOnePost(postId: string, isUpVoted: boolean): Promise<number> {
+        return new Promise<number>(resolve => {
+            resolve(-1);
+        });
+    }
 
     private votePost(postId: string, voterId: string, isUpvote: boolean): Post {
         const index = this.posts.findIndex(e => e.id === postId);
