@@ -2,15 +2,6 @@
 
 ## Installation 
 Requirements:
-* [Neo4j (Desktop)](https://neo4j.com/download/?ref=try-neo4j-lp)
-* [Nodejs](https://nodejs.org/en/)
-
-#### NPM
-First step is to install the dependencies via npm:
-```
-$ npm install´
-```
-#### Environment Files
 The environment variables are stored in two files: one for development `dev.env`
 and one for testing `test.env`.
 
