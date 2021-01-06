@@ -21,13 +21,13 @@ jobs:
         node-version: '14.x'
     - name: Install
       run: npm install
-      working-directory: webapp
+      working-directory: no-nuxt-pls
     - name: Run Linter
       run: npm run lint
-      working-directory: webapp
+      working-directory: no-nuxt-pls
     - name: Run Tests
       run: npm run test:unit
-      working-directory: webapp
+      working-directory: no-nuxt-pls
       env:
         CI: true
   check-backend:
