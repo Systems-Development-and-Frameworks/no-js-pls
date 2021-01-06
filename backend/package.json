@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "dev": "dotenv -e dev.env -- nodemon -e ts src/index.ts",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "dotenv -e test.env -- jest"
   },
   "keywords": [],
   "author": "",
@@ -16,15 +17,23 @@
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
     "apollo-server-testing": "^2.19.0",
+    "dotenv-cli": "^4.0.0",
     "eslint": "^7.13.0",
     "eslint-plugin-graphql": "^4.0.0",
     "graphqlgen": "^0.6.0-rc9",
     "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
     "ts-jest": "^26.4.4"
   },
   "dependencies": {
     "apollo-datasource": "^0.7.2",
     "apollo-server": "^2.19.0",
+    "dotenv": "^8.2.0",
+    "env-var": "^7.0.0",
+    "graphql-middleware": "^4.0.2",
+    "graphql-shield": "^7.4.2",
+    "jsonwebtoken": "^8.5.1",
+    "save-dev": "0.0.1-security",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   }

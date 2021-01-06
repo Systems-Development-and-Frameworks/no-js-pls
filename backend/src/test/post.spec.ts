@@ -1,37 +1,50 @@
 import { createTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server'
 import { createServer } from "../server";
-import { InMemoryDatasource } from "../database/InMemoryDatasource";
+import { InMemoryDatasource } from '../database/InMemoryDatasource';
+import { generateSHA512Hash } from '../authorization/cryptography';
+import { Post } from "../interfaces/Post";
+import { User } from "../interfaces/User";
+import { verifyToken } from "../authorization/authorization";
 
 let db: InMemoryDatasource = new InMemoryDatasource();
 const server = createServer(db);
 const {query, mutate} = createTestClient(server);
 
-const getDummyUsers = () => [
+const getDummyUsers = (): User[] => [
     {
-        name: 'Stefan'
+        id: '123',
+        name: 'Stefan',
+        email: 'test1@test.de',
+        password: generateSHA512Hash('test123')
     },
     {
-        name: 'Daniel'
+        id: '456',
+        name: 'Daniel',
+        email: 'test2@test.de',
+        password: generateSHA512Hash('test123')
     },
     {
-        name: 'Robin'
+        id: '789',
+        name: 'Robin',
+        email: 'test3@test.de',
+        password: generateSHA512Hash('test123')
     }
 ];
 
-const getDummyPosts = () => [
+const getDummyPosts = (): Post[] => [
     {
         id: '0',
         title: 'Test1',
         votes: 0,
-        author: getDummyUsers()[0],
+        author: '123',
         lastVoted: []
     },
     {
         id: '1',
         title: 'Test2',
         votes: 0,
-        author: getDummyUsers()[1],
+        author: '456',
         lastVoted: []
     }
 ];
@@ -87,16 +100,27 @@ describe('queries', () => {
 })
 
 describe('mutations', () => {
+    beforeEach(async () => {
+        const SIGNUP_USER = gql`
+            mutation ($name: String!, $email: String!, $password: String!) {
+                signup(name: $name, email: $email, password: $password)
+            }
+        `;
+
+        const data = await mutate({ mutation: SIGNUP_USER, variables: {
+                name:"Guy", email:"GUY@GUY.de", password:"123456789"
+            } });
+
+        server.requestOptions.context = () => ({userId: verifyToken(data.data.signup)});
+    })
 
     describe('WRITE_POST', () => {
         const action = () => mutate({ mutation: WRITE_POST, variables: {
             post: {
                 title: 'Some post',
-                author: {
-                       name: getDummyUsers()[0].name
-                }
             }
-        }});
+        }},
+        );
         const WRITE_POST = gql`
             mutation($post: PostInput!) {
                 write(post: $post) {
@@ -120,14 +144,25 @@ describe('mutations', () => {
                     data: { write: { title: 'Some post', id: expect.any(String) } }
                 });
         })
+
+        it('write a post without a token should fail', async () => {
+            server.requestOptions.context = () => ({});
+            await expect(action())
+                .resolves
+                .toMatchObject(
+                    {
+                        errors: [{message: 'Not Authorised!'}]
+                    }
+                );
+        })
     })
 
     describe('UPVOTE_POST', () => {
         const action = () => mutate({ mutation: UPVOTE_POST, variables: {id: getDummyPosts()[0].id,
                 voter: {name: getDummyUsers()[0].name}}});
         const UPVOTE_POST = gql`
-            mutation ($id: ID!, $voter: UserInput!) {
-                upvote(id: $id, voter: $voter) {
+            mutation ($id: ID!) {
+                upvote(id: $id) {
                     id
                     title
                     votes
@@ -135,7 +170,7 @@ describe('mutations', () => {
             }
         `;
 
-        beforeEach(() => {
+        beforeEach(async () => {
             db.posts = getDummyPosts();
         })
 
@@ -150,6 +185,17 @@ describe('mutations', () => {
             await action();
             await action();
             expect(db.posts.find(e => e.id === getDummyPosts()[0].id).votes).toBe(1);
+        })
+
+        it('upvote post without a token, should fail', async () =>{
+            server.requestOptions.context = () => ({});
+            await expect(action())
+                .resolves
+                .toMatchObject(
+                    {
+                        errors: [{message: 'Not Authorised!'}]
+                    }
+                );
         })
     })
 })
