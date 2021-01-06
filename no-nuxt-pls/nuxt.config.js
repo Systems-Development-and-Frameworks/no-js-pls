@@ -1,3 +1,5 @@
+import { config } from "@vue/test-utils";
+
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'static',
@@ -36,11 +38,27 @@ export default {
     '@nuxtjs/pwa',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+    '@nuxtjs/apollo',
   ],
+  storybook: {
+    addons: [
+      '@storybook/addon-controls',
+      '@storybook/addon-links',
+      '@storybook/addon-essentials',
+      '@storybook/addon-a11y',
+      ]
+  },
 
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
+
+  apollo: {
+    clientConfigs: {
+      default: '~/plugins/apollo.config.js',
+    },
+    authenticationType: 'Bearer',
+  },
 }
