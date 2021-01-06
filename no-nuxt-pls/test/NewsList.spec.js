@@ -23,7 +23,7 @@ describe('NewsList.vue', () => {
     expect(wrapper.findAllComponents(NewsItem).length).toBe(items.length);
   });
 
-  test('toggles between ascending and descending order', async () => {
+  test('toggles between ascending and descending order', () => {
     const wrapper = mount(NewsList);
     const startingState = wrapper.vm.$data.currentSortingOrder;
 
