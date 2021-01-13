@@ -30,10 +30,6 @@ export const actions = {
   async login(context: ActionContext<any, any>, credentials: any) {
     context.commit(SET_LOADING, true);
     try {
-        const { login } = await this.app.apolloProvider.defaultClient.mutate({mutation: gql`mutation ($email: String!, $password: String!){
-            login(email: $email, password: $password)
-          }`, variables: credentials});
-        await this.$apolloHelpers.onLogin(login);
         context.commit(SET_CURRENT_USER, credentials.email);
       }finally {
       context.commit(SET_LOADING, false);

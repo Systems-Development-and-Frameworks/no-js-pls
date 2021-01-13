@@ -1,5 +1,5 @@
-import { config } from "@vue/test-utils";
 import * as http from "http";
+import { config } from "@vue/test-utils";
 
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
@@ -60,10 +60,5 @@ export default {
     clientConfigs: {
       default: { httpEndpoint: "http://localhost:4000" }
     },
-    // Sets the authentication type for any authorized request.
-    authenticationType: 'Bearer',
-
-// Token name for the cookie which will be set in case of authentication
-    tokenName: 'apollo-token',
   },
 }

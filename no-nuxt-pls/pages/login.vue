@@ -2,20 +2,9 @@
   <LoginForm></LoginForm>
 </template>
 
-<script>
-import { Component, Vue } from 'nuxt-property-decorator';
-import LoginForm from '~/components/LoginForm/LoginForm';
-
-@Component({
-  components: {
-    LoginForm
-  },
-})
+<script >
+import LoginForm from '~/components/LoginForm/LoginForm.vue';
 export default {
-  name: "login"
-};
+  components: { LoginForm }
+}
 </script>
-
-<style scoped>
-
-</style>

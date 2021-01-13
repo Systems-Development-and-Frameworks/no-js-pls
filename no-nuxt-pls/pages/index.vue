@@ -4,15 +4,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator';
+<script >
 import NewsList from '~/components/NewsList/NewsList.vue';
-import { apolloProvider } from "~/plugins/apollo.client";
-
-@Component({
-  components: {
-    NewsList,
-  },
-})
-export default Vue.extend({})
+export default {
+  components: { NewsList }
+}
 </script>
