@@ -168,6 +168,17 @@ describe('mutations', () => {
                     }
                 );
         })
+
+        it('upvote post without a token, should fail', async () =>{
+            server.requestOptions.context = () => ({});
+            await expect(action())
+                .resolves
+                .toMatchObject(
+                    {
+                        errors: [{message: 'Not Authorised!'}]
+                    }
+                );
+        })
     })
 })
 
