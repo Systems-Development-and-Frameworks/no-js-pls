@@ -16,19 +16,20 @@ export const UserMutationResolver: Pick<MutationResolvers.Type
     | 'signup'
     > = {
     // @ts-ignore
-    login: (parent, {email, password}, {dataSources}) => {
-        const user = dataSources.databaseAPI.getUserPerEmail(email);
+    login: async (parent, {email, password}, {dataSources}) => {
+        email = email.toLocaleLowerCase();
+        const user = await dataSources.databaseAPI.getUserPerEmail(email);
         if (!user) return null;
         if (user.password !== generateSHA512Hash(password)) return null;
         return createToken(user.id);
     },
     // @ts-ignore
-    signup: (parent, {name, email, password}, { dataSources }) => {
+    signup: async (parent, {name, email, password}, {dataSources}) => {
         email = email.toLocaleLowerCase();
         if (password.length < 8) throw Error('Password is too short!');
         if (email.indexOf('@') < 1) throw Error('Invalid email address!');
-        if (dataSources.databaseAPI.getUserPerEmail(email) !== undefined) throw Error('Email address already taken!');
-        const userId = dataSources.databaseAPI.createUser(name, email, password);
+        if (await dataSources.databaseAPI.getUserPerEmail(email)) throw Error('Email address already taken!');
+        const userId = await dataSources.databaseAPI.createUser(name, email, password);
         return createToken(userId);
     }
 };

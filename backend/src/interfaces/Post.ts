@@ -5,7 +5,7 @@ export interface Post {
     title: string;
     votes: number;
     author: string;
-    lastVoted: Votes[];
+    lastVoted?: Votes[];
 }
 
 interface Votes {
