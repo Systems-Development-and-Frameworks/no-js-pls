@@ -22,17 +22,97 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Item } from '@/interface/item'
+import gql from 'graphql-tag';
 import NewsItem from '../NewsItem/NewsItem.vue'
 import NewsForm from '../NewsForm/NewsForm.vue'
 
-const enum SortingOrder {
-  Desc,
-  Asc,
+const SortingOrder = {
+  Desc: 0,
+  Asc: 1,
 }
 
+const FETCH_ITEMS = gql`query {posts {id,title,votes,author {id,name,email}} }`;
+const UPVOTE_MUTATION = gql`mutation ($id: ID!){upvote(id: $id) {id, title, votes, author {id, name, email}}}`;
+const WRITE_MUTATION = gql`mutation ($title: String!){write(post: {title: $title}) {id, title, votes, author {id, name, email}}}`;
+
+export default {
+  data() {
+    return {
+      newsItems: {},
+      token: '',
+    }
+  },
+
+  async mounted() {
+    this.token = this.$apolloHelpers.getToken();
+    const { data } = await this.$apollo.query({ query: FETCH_ITEMS });
+    this.newsItems = data.posts;
+  },
+
+  methods: {
+    vote() {
+      this.sortNews();
+    },
+
+    isEmpty() {
+      return this.newsItems.length < 1;
+    },
+
+    showOrderByDesc() {
+      if (this.newsItems.length < 2) {
+        return false;
+      }
+
+      return this.currentSortingOrder === SortingOrder.Desc;
+    },
+
+    showOrderByAsc() {
+      if (this.newsItems.length < 2) {
+        return false;
+      }
+
+      return this.currentSortingOrder === SortingOrder.Asc;
+    },
+
+    removeItem(item) {
+      this.newsItems = this.newsItems.filter((elem) => elem.id !== item.id);
+    },
+
+    addItem(title) {
+      if (title && title.length < 64) {
+      const item = { title, votes: 0, id: this.index++ };
+      this.newsItems.push(item);
+      this.sortNews(this.currentSortingOrder);
+      }
+    },
+
+    sortDesc() {
+      this.newsItems = this.newsItems.sort((a, b) => b.votes - a.votes);
+      this.currentSortingOrder = SortingOrder.Desc;
+    },
+
+    sortAsc() {
+      this.newsItems = this.newsItems.sort((a, b) => a.votes - b.votes);
+      this.currentSortingOrder = SortingOrder.Asc;
+    },
+
+    sortNews(order = SortingOrder.Desc) {
+      switch (order) {
+      case SortingOrder.Desc:
+        this.sortDesc();
+        break;
+      case SortingOrder.Asc:
+        this.sortAsc();
+        break;
+      }
+    }
+  }
+}
+
+/*
 @Component({
   components: {
     NewsItem,
@@ -114,6 +194,7 @@ export default class NewsList extends Vue {
     }
   }
 }
+*/
 </script>
 
 <style scoped></style>

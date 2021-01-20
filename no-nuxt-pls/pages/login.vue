@@ -3,16 +3,10 @@
 </template>
 
 <script>
-import { Component, Vue } from 'nuxt-property-decorator';
 import LoginForm from '~/components/LoginForm/LoginForm';
 
-@Component({
-  components: {
-    LoginForm
-  },
-})
 export default {
-  name: "login"
+  components: { LoginForm }
 };
 </script>
 

@@ -2,13 +2,45 @@
   <div>
     <h2>{{news.title}} ({{news.votes}})</h2>
     <br>
-    <button @click="updateNews(1)">Upvote</button>
-    <button @click="updateNews(-1)">Downvote</button>
-    <button @click="deleteNews">Remove</button>
+    <button v-if="token" @click="updateNews(1)">Upvote</button>
+    <button v-if="token" @click="updateNews(-1)">Downvote</button>
+    <button v-if="authorId === news.author.id" @click="deleteNews">Remove</button>
   </div>
 </template>
 
-<script lang="ts">
+<script>
+import jwtDecode from "jwt-decode";
+
+export default {
+  data() {
+    return {
+      token: '',
+      authorId: ''
+    }
+  },
+
+  mounted() {
+    this.token = this.$apolloHelpers.getToken();
+    if (this.token) {
+      this.authorId = jwtDecode(this.token);
+    }
+  },
+
+  props: {
+    news: Object
+  },
+
+  methods: {
+    updateNews(value) {
+      this.news.votes += value;
+      this.$emit('update');
+    },
+    deleteNews() {
+      this.$emit('remove', this.news);
+    }
+  }
+}
+/*
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator';
 import { Item } from '@/interface/item';
 
@@ -27,6 +59,7 @@ export default class NewsItem extends Vue {
   }
 
 }
+*/
 </script>
 
 <style scoped>
