@@ -1,5 +1,5 @@
-import { config } from "@vue/test-utils";
 import * as http from "http";
+import { config } from "@vue/test-utils";
 
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
