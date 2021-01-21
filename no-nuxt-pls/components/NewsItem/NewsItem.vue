@@ -4,36 +4,23 @@
     <br>
     <button v-if="token" @click="updateNews(1)">Upvote</button>
     <button v-if="token" @click="updateNews(-1)">Downvote</button>
-    <button v-if="authorId === news.author.id" @click="deleteNews">Remove</button>
+    <button v-if="authorId === news.author.id" @click="deleteNews">Delete</button>
+    <button v-if="authorId === news.author.id">Edit</button>
   </div>
 </template>
 
 <script>
-import jwtDecode from "jwt-decode";
 
 export default {
-  data() {
-    return {
-      token: '',
-      authorId: ''
-    }
-  },
-
-  mounted() {
-    this.token = this.$apolloHelpers.getToken();
-    if (this.token) {
-      this.authorId = jwtDecode(this.token);
-    }
-  },
-
   props: {
-    news: Object
+    news: Object,
+    token: String,
+    authorId: String,
   },
 
   methods: {
     updateNews(value) {
-      this.news.votes += value;
-      this.$emit('update');
+      this.$emit('update', this.news);
     },
     deleteNews() {
       this.$emit('remove', this.news);

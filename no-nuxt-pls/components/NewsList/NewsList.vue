@@ -14,20 +14,19 @@
       v-for="item in newsItems"
       :key="item.id"
       :news="item"
-      @update="vote"
-      @remove="removeItem"
+      :token="token"
+      :authorId="authorId"
+      @update="vote($event)"
+      @remove="removeItem($event)"
     ></NewsItem>
     <br />
-    <NewsForm @sendTitle="addItem"></NewsForm>
+    <NewsForm v-if="token" @sendTitle="addItem($event)"></NewsForm>
   </div>
 </template>
 
 <script>
-import { Vue, Component } from 'nuxt-property-decorator'
-import { Item } from '@/interface/item'
 import gql from 'graphql-tag';
-import NewsItem from '../NewsItem/NewsItem.vue'
-import NewsForm from '../NewsForm/NewsForm.vue'
+import jwtDecode from "jwt-decode";
 
 const SortingOrder = {
   Desc: 0,
@@ -41,19 +40,33 @@ const WRITE_MUTATION = gql`mutation ($title: String!){write(post: {title: $title
 export default {
   data() {
     return {
-      newsItems: {},
+      newsItems: [],
       token: '',
+      authorId: '',
+      currentSortingOrder: SortingOrder.Desc,
     }
   },
 
   async mounted() {
-    this.token = this.$apolloHelpers.getToken();
-    const { data } = await this.$apollo.query({ query: FETCH_ITEMS });
-    this.newsItems = data.posts;
+    await this.setupNewsList();
   },
 
   methods: {
-    vote() {
+    async setupNewsList() {
+      this.token = this.$apolloHelpers.getToken();
+      if (this.token) {
+        this.authorId = jwtDecode(this.token).userId;
+      }
+      const { data } = await this.$apollo.query({ query: FETCH_ITEMS });
+      this.newsItems = data.posts;
+    },
+
+    async vote(item) {
+      const { data } = await this.$apollo.mutate({ mutation: UPVOTE_MUTATION, variables: { id: item.id } });
+      if (data.upvote) {
+        this.newsItems = this.newsItems.filter((elem) => elem.id !== item.id);
+        this.newsItems.push(data.upvote);
+      }
       this.sortNews();
     },
 
@@ -81,11 +94,14 @@ export default {
       this.newsItems = this.newsItems.filter((elem) => elem.id !== item.id);
     },
 
-    addItem(title) {
+    async addItem(title) {
       if (title && title.length < 64) {
-      const item = { title, votes: 0, id: this.index++ };
-      this.newsItems.push(item);
-      this.sortNews(this.currentSortingOrder);
+        const item = { title, votes: 0, id: this.index++ };
+        const { data } = await this.$apollo.mutate({ mutation: WRITE_MUTATION, variables: { title } });
+        if (data.write) {
+          this.newsItems.push(item);
+          this.sortNews(this.currentSortingOrder);
+        }
       }
     },
 

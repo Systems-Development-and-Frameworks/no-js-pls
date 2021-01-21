@@ -29,6 +29,7 @@ export default {
     logout() {
       this.token = null;
       this.$apolloHelpers.onLogout();
+      window.location.reload(false);
     },
   },
 };

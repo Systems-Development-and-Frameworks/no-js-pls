@@ -66,4 +66,17 @@ export default {
 // Token name for the cookie which will be set in case of authentication
     tokenName: 'apollo-token',
   },
+
+  pwa: {
+    manifest: {
+      name: 'Hacker News App',
+      short_name: 'News',
+      start_url: 	'/',
+      display: 'standalone',
+      theme_color: 'azure',
+      lang: 'de',
+      useWebmanifestExtension: false,
+      icon: [],
+    }
+  }
 }
