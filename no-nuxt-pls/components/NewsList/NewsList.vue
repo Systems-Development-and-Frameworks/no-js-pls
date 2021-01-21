@@ -27,6 +27,7 @@
 <script>
 import gql from 'graphql-tag';
 import jwtDecode from "jwt-decode";
+import NewsItem from "~/components/NewsItem/NewsItem";
 
 const SortingOrder = {
   Desc: 0,
@@ -38,6 +39,9 @@ const UPVOTE_MUTATION = gql`mutation ($id: ID!){upvote(id: $id) {id, title, vote
 const WRITE_MUTATION = gql`mutation ($title: String!){write(post: {title: $title}) {id, title, votes, author {id, name, email}}}`;
 
 export default {
+  components: {
+    NewsItem
+  },
   data() {
     return {
       newsItems: [],

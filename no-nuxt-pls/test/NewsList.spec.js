@@ -29,7 +29,7 @@ describe('NewsList.vue', () => {
 
   test('renders <NewsItem> for each item', async () => {
     jest.spyOn(NewsList.methods, 'setupNewsList').mockImplementation(() => {});
-    const wrapper = mount(NewsList, { sync: false });
+    const wrapper = shallowMount(NewsList);
     wrapper.setData({
       newsItems: [
           {
@@ -57,12 +57,7 @@ describe('NewsList.vue', () => {
     });
     const items = wrapper.vm.$data.newsItems;
     await wrapper.vm.$nextTick();
-    console.log('Items: ', items.length);
-    console.log('NewsItems: ', wrapper.findAllComponents(NewsItem));
-    console.log('NewsItems length: ', wrapper.findAllComponents(NewsItem).length);
-    console.log('HTML:', wrapper.html());
 
-    // expect(wrapper.findAllComponents(NewsItem).length).toBe(items.length);
     expect(wrapper.findAllComponents(NewsItem).length).toBe(items.length);
   });
 
@@ -104,7 +99,7 @@ describe('NewsList.vue', () => {
       authorId: '',
       currentSortingOrder: 0,
     });
-    await wrapper.vm.$nextTick(); // this is the greatest testing framework
+    await wrapper.vm.$nextTick(); // this is the greatest testing framework since the beginning of testing frameworks maybe ever (:
 
     const startingState = wrapper.vm.$data.currentSortingOrder;
 
