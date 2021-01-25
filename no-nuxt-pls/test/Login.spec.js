@@ -4,7 +4,7 @@ import Menu from '@/components/Menu/Menu.vue';
 
 
 describe('Menu.vue', () => {
-  test('renders login when user is not logged in', async () => {
+  test('renders login when user is not logged in', () => {
     jest.spyOn(Menu.methods, 'setupMenu').mockImplementation(() => {});
     const wrapper = shallowMount(Menu, {
         stubs: {
