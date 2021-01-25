@@ -22,10 +22,13 @@ export default {
   },
 
   mounted() {
-    this.token = this.$apolloHelpers.getToken();
+    this.setupMenu();
   },
 
   methods: {
+    setupMenu(){
+      this.token = this.$apolloHelpers.getToken();
+    },
     logout() {
       this.token = null;
       this.$apolloHelpers.onLogout();

@@ -4,15 +4,6 @@ import NewsList from '@/components/NewsList/NewsList.vue';
 import NewsItem from '@/components/NewsItem/NewsItem.vue';
 
 describe('NewsList.vue', () => {
-  const $apolloHelpers = {
-    getToken() { return '123' }
-  };
-  const $apollo = {
-    query(options) {return ''}
-  };
-
-  // const mounted = () => {};
-
   test('renders list is empty message when empty', async () => {
     const msg = 'list is empty :(';
     jest.spyOn(NewsList.methods, 'setupNewsList').mockImplementation(() => {});
