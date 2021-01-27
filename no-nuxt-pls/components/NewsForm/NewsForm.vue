@@ -1,7 +1,7 @@
 <template>
   <form aria-label="Create NewsItem" @submit.prevent="submitTitle">
-    <input aria-label="CreateTitle" type="text" v-model="title" placeholder="Type title here">
-    <button type="submit">Create</button>
+    <input class="border border-grey-light" aria-label="CreateTitle" type="text" v-model="title" placeholder="Type title here">
+    <button class="text-white bg-green-500 hover:bg-green-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium" type="submit">Create</button>
   </form>
 </template>
 

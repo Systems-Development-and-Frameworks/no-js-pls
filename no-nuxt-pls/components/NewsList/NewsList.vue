@@ -1,38 +1,105 @@
 <template>
-  <div>
-    <h1>News List</h1>
+  <div class="p-24">
+    <h1 class="text-2xl text-center font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate p-12">News List</h1>
+    <div class="flex items-center justify-center">
+      <NewsForm v-if="token" @sendTitle="addItem($event)"></NewsForm>
+    </div>
     <br />
-    <button v-if="showOrderByDesc()" type="button" @click="sortAsc()">
+    <button
+      class="text-gray-300 bg-gray-600 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+      v-if="showOrderByDesc()" type="button" @click="sortAsc()">
       Sort &#x2B06;
     </button>
-    <button v-else-if="showOrderByAsc()" type="button" @click="sortDesc()">
+    <button
+      class="text-gray-300 bg-gray-600 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+      v-else-if="showOrderByAsc()" type="button" @click="sortDesc()">
       Sort &#x2B07;
     </button>
     <br />
     <h3 v-if="isEmpty()">The list is empty :(</h3>
-    <NewsItem
-      v-for="item in newsItems"
-      :key="item.id"
-      :news="item"
-      :token="token"
-      :authorId="authorId"
-      @update="vote($event)"
-      @remove="removeItem($event)"
-    ></NewsItem>
-    <br />
-    <NewsForm v-if="token" @sendTitle="addItem($event)"></NewsForm>
+    <div class="grid md:grid-cols-3 gap-5 gap-y-10">
+      <NewsItem
+        v-for="item in newsItems"
+        :key="item.id"
+        :news="item"
+        :token="token"
+        :authorId="authorId"
+        @update="vote($event)"
+        @remove="removeItem($event)"
+      ></NewsItem>
+    </div>
+    <footer class="container bg-grey-lighter p-8">
+      <hr class="p-4">
+      <div class="sm:flex mb-4">
+        <div class="sm:w-1/4 h-auto">
+          <div class="text-orange-500 mb-2">Orange</div>
+          <ul class="list-reset leading-normal">
+            <li class="hover:text-orange text-grey-darker">One</li>
+            <li class="hover:text-orange text-grey-darker">Two</li>
+            <li class="hover:text-orange text-grey-darker">Three</li>
+            <li class="hover:text-orange text-grey-darker">Four</li>
+            <li class="hover:text-orange text-grey-darker">Five</li>
+            <li class="hover:text-orange text-grey-darker">Six</li>
+            <li class="hover:text-orange text-grey-darker">Seven</li>
+            <li class="hover:text-orange text-grey-darker">Eight</li>
+          </ul>
+        </div>
+        <div class="sm:w-1/4 h-auto sm:mt-0 mt-8">
+          <div class="text-blue-500 mb-2">Blue</div>
+          <ul class="list-reset leading-normal">
+            <li class="hover:text-blue text-grey-darker">One</li>
+            <li class="hover:text-blue text-grey-darker">Two</li>
+            <li class="hover:text-blue text-grey-darker">Three</li>
+          </ul>
+
+          <div class="text-blue-300 mb-2 mt-4">Blue-light</div>
+          <ul class="list-reset leading-normal">
+            <li class="hover:text-blue-light text-grey-darker">One</li>
+            <li class="hover:text-blue-light text-grey-darker">Two</li>
+            <li class="hover:text-blue-light text-grey-darker">Three</li>
+          </ul>
+
+        </div>
+        <div class="sm:w-1/4 h-auto sm:mt-0 mt-8">
+          <div class="text-green-900 mb-2">Green-dark</div>
+          <ul class="list-reset leading-normal">
+            <li class="hover:text-green-dark text-grey-darker">One</li>
+            <li class="hover:text-green-dark text-grey-darker">Two</li>
+            <li class="hover:text-green-dark text-grey-darker">Three</li>
+          </ul>
+
+          <div class="text-green-400 mb-2 mt-4">Green-light</div>
+          <ul class="list-reset leading-normal">
+            <li class="hover:text-green-light text-grey-darker">One</li>
+            <li class="hover:text-green-light text-grey-darker">Two</li>
+            <li class="hover:text-green-light text-grey-darker">Three</li>
+          </ul>
+
+
+        </div>
+        <div class="sm:w-1/2 sm:mt-0 mt-8 h-auto">
+          <div class="text-red-500 mb-2">Newsletter</div>
+          <p class="text-gray-700 leading-normal">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, consectetur. </p>
+          <div class="mt-4 flex">
+            <input type="text" class="p-2 border border-grey-light round text-grey-dark text-sm h-auto" placeholder="Your email address">
+            <button class="bg-orange-500 text-white rounded-sm h-auto text-xs p-3">Subscribe</button>
+          </div>
+        </div>
+
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 import jwtDecode from "jwt-decode";
 import NewsItem from "~/components/NewsItem/NewsItem";
 
 const SortingOrder = {
   Desc: 0,
-  Asc: 1,
-}
+  Asc: 1
+};
 
 const FETCH_ITEMS = gql`query {posts {id,title,votes,author {id,name,email}} }`;
 const UPVOTE_MUTATION = gql`mutation ($id: ID!){upvote(id: $id) {id, title, votes, author {id, name, email}}}`;
@@ -45,10 +112,10 @@ export default {
   data() {
     return {
       newsItems: [],
-      token: '',
-      authorId: '',
-      currentSortingOrder: SortingOrder.Desc,
-    }
+      token: "",
+      authorId: "",
+      currentSortingOrder: SortingOrder.Desc
+    };
   },
 
   async mounted() {
@@ -121,16 +188,16 @@ export default {
 
     sortNews(order = SortingOrder.Desc) {
       switch (order) {
-      case SortingOrder.Desc:
-        this.sortDesc();
-        break;
-      case SortingOrder.Asc:
-        this.sortAsc();
-        break;
+        case SortingOrder.Desc:
+          this.sortDesc();
+          break;
+        case SortingOrder.Asc:
+          this.sortAsc();
+          break;
       }
     }
   }
-}
+};
 
 /*
 @Component({
