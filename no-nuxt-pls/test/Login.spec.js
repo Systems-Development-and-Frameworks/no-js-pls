@@ -12,7 +12,8 @@ describe('Menu.vue', () => {
         }
       });
     const logoutButton = wrapper.find('button');
-    expect(logoutButton.exists()).toBe(false);
+    // expect(logoutButton.exists()).toBe(false);
+    expect(wrapper.html()).not.toContain('Logout');
   });
 
   test('renders logout when user is logged in', async () => {
@@ -30,7 +31,7 @@ describe('Menu.vue', () => {
 });
 
 describe('LoginForm.vue', () =>
-{    
+{
     test('not able to login with invalid credentials', async () => {
       const msg = 'Oops! Something went wrong.';
       const method = jest.spyOn(LoginForm.methods, 'submitLogin');
